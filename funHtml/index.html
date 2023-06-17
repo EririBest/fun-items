@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="js/vue.js" type="text/javascript"></script>
+	<script src="js/axios.js" type="text/javascript"></script>
+	<script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+    <title>SpeaK帖子审查</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+		  .ntd{
+		    width: 130px;
+		    height: 30px;
+		    font-size: 19px;
+		    background-color: cornflowerblue;
+		    border: 0px;
+		    border-radius:10px;
+		  }
+		  .btns{
+			  margin: 0 auto;
+			  padding: 16px;
+			  font-size: 20px;
+			  color: #2196f3;
+			  background: none;
+		  }
+		  #speak{
+			   background: #031321;
+			   font-family: consolas;
+		  }
+		  .btns:hover{   
+			  color: #255784;
+			  background: #2196f3;
+			  box-shadow: 0 0 10px #2196f3, 0 0 40px #2196f3, 0 0 80px #2196f3;
+			  cursor: pointer;
+			}
+			.user{
+				position: relative;
+				width: 300px;
+				height: 300px;
+				margin-top: 20px;
+				border: 2px solid #2196f3;
+				color: #2196f3;
+				margin: 0 auto;
+				margin-left: 30px;
+				box-shadow: 0 0 2px #2196f3, 0 0 10px #2196f3, 0 0 40px #2196f3;"
+			}
+			.uneasl{
+				background: none;
+				border: 0px;
+				color: #45ef07;
+				padding: 7px;
+			}
+			.uneasl:hover{
+				color: #255784;
+				background: #45ef07;
+				box-shadow: 0 0 10px #45ef07, 0 0 40px #45ef07, 0 0 80px #45ef07;
+				cursor: pointer;
+			}
+			.ban{
+				opacity: 0;
+				transition: all .4s;
+			}
+			.user:hover .ban{
+				opacity: 0.9;
+				cursor: pointer;
+			}
+			#into{
+				width: 120px;
+				height: 40px;
+				margin-top: 30px;
+				background: none;
+				color: #2196f3;
+				border: 1px solid #2196f3;
+				font-size: 22px;
+				border-radius: 4px;
+			}
+			#into:hover{
+				 border: 0px;
+				 color: #255784;
+				 background-color: #2196f3;
+				 box-shadow: 0 0 10px #2196f3, 0 0 40px #2196f3, 0 0 80px #2196f3;
+			}
+			#login{
+				margin-top: 30px;
+				text-align: center;
+			}
+			.lg{
+				font-size: 25px;
+				border: 0px;
+				color: #2196f3;
+				margin-top: 20px;
+				border-bottom:1px solid #2196f3;
+				background: none;
+				outline: none;
+				text-shadow: 0 0 10px #2196f3, 0 0 40px #2196f3, 0 0 80px #2196f3;
+			}
+			.neon-text {
+			  font-family: 'Monoton', cursive;
+			  font-size: 100px;
+			  animation: neon 4s infinite;
+			}
+			.neon-by {
+			  color: #e91e63;
+			  text-shadow: -3px 0px 5px #e91e63, 0px 0px 2px #e91e63;
+			}
+			@keyframes neon {
+			  0%, 30%, 32%, 34% {
+			    color: #222;
+			    text-shadow: -3px 0px 5px #222, 0px 0px 2px #222; 
+			  }
+			  31%, 33%, 35%, 100% {
+			    color: #e91e63;
+			    text-shadow: -3px 0px 5px #e91e63, 0px 0px 2px #e91e63;
+			  }
+			}
+    </style>
+</head>
+<body>
+    <div id="speak" style="width: 100%;height: 100vh;overflow: hidden;">
+		<div style="width: 100%;height: 100%;text-align: center;" v-show="login===0" >
+			<h1 style="text-align: center;color: #2196f3;text-shadow: 0 0 10px #2196f3, 0 0 40px #2196f3, 0 0 80px #2196f3;margin-top: 17%;">Fun管理员登录页面</h1>
+			<form  id="login" >
+				<input type="text" name="name" class="lg" v-model="name" placeholder="用户名">
+				<br>
+				<input type="password" name="password" v-model="password"  class="lg" placeholder="密码">
+				<br>
+			</form>
+				<button id="into" @click="ln()">登录</button>
+		</div>
+		<div style="display: flex;flex-direction: row;" v-show="login===1">
+			<div class="btns" @click="show=2,getUsers()">用户管理</div>
+			<div class="btns" @click="show=1">帖子管理</div>
+			<div class="btns" @click="exit()">退出登录</div>
+		</div>
+		<div style="width: 90%;height: 100vh;overflow-y: auto;overflow-x: hidden;margin: 0 auto;text-align: center;"   id="sddd" v-show="show===0&&login===1">
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>		
+			<span class="neon-text" style="font-size: 290px;">^=^⌨@Fun</span>
+			<br>
+			<span class="neon-by" style="font-size: 30px;">欢迎登录 {{name}}  管理员,</span><span class="neon-by" style="font-size: 30px;" id="add"></span>
+		</div>
+		<br>
+		<br>
+		<div style="width: 90%;height: 100vh;overflow-y: auto;overflow-x: hidden;margin: 0 auto;display: flex;flex-direction: row;"  v-show="show===2&&login===1">
+			<div v-for="item in uList" class="user">
+				<div style="width: 100%;height: 100%;position: absolute;background-color:#2196f3;opacity: 0.9;" v-show="item.flag===0">
+					<div><button class="uneasl" @click="uneasl(item.id)">解封该用户</button></div>
+					<div style="color: pink;text-align: center;font-size: 30px;line-height: 260px;">该用户已被封禁</div>
+				</div>
+				<div style="width: 100%;height: 100%;position: absolute;background-color:#2196f3;" class="ban" v-show="item.flag===1" @click="banUser(item.id)">
+					<div style="color: pink;text-align: center;font-size: 30px;line-height: 300px;">封禁该用户</div>
+				</div>
+				<div style="width: 100%;height: 100%;overflow: hidden;">
+					<img :src="'http://localhost:8086/'+item.imgpath" style="height: 300px;" alt="" v-show="item.imgpath!==null">
+					<div v-show="item.imgpath===null" style="text-align: center;line-height: 300px;">该用户未上传头像</div>
+				</div>
+				<div style="font-size: 30px;">用户:{{item.name}}</div>
+			</div>
+		</div>
+		<div style="width: 90%;height: 100vh;overflow-y: auto;overflow-x: hidden;margin: 0 auto;" v-show="show===1&&login===1">
+			<div v-for="item in tList" :key="item" 
+			          style="width: 90%;
+					  height: 200px;border-bottom: 1px solid black;position: relative;
+					  border: 2px solid #2196f3;
+					  color: #2196f3;
+					  margin-left: 5%;
+					  margin-top: 30px;
+					  box-shadow: 0 0 2px #2196f3, 0 0 10px #2196f3, 0 0 25px #2196f3;">
+				<div style="position: absolute;left:5%;width: 25%;height: 100%;text-align: center;top: 10px;">
+				  <h2>标题：{{ item.title }}</h2>
+				  <h3>提交时间 {{ item.ctime }} 作者:{{ item.author }}</h3>
+				  <div style="word-wrap: break;white-space: normal;width: 280px;height: auto;text-align: left;margin-left: 45px;">话题内容：{{ item.text }}</div>
+				</div>
+				<img :src="'http://localhost:8086/'+item.authorheader" style="width: 120px;height: 120px;position: absolute;left:0%;top: 40px;" alt="">
+			   <div style="position: absolute;left: 30%;width: 50%;top: 60px;">
+				<img v-for="ite in imgList(item.imgpath)" :key="ite" :src="'http://localhost:8086/'+ite" style="height: 80px;" alt="">
+			  </div>
+			  <div style="position: absolute;left: 86%;width: 20%;">
+				  <br>
+				<div><button class="btns" @click="passState(item.id,2)" v-show="item.state===1" style="font-style: 10px;border: 0px;">审核通过(普通)</button></div>
+				<div><button class="btns"  @click="passState(item.id,3)" v-show="item.state===1" style="font-style: 10px;border: 0px;">审核通过(精华)</button></div>
+				<div><button class="btns" v-show="item.state===1" @click="passState(item.id,0)" style="font-style: 10px;border: 0px;">无法通过</button></div>
+				<div><button class="btns" v-show="item.state!==0&&item.state!==1" @click="passState(item.id,0)" style="font-style: 10px;border: 0px;">封禁帖子</button></div>
+				<div><button class="btns" v-show="item.state===0" @click="passState(item.id,1)" style="font-style: 10px;border: 0px;">重新审核该帖子</button></div>
+				<div><button class="btns" v-show="item.state!==1" @click="delC(item.id)" style="font-style: 10px;border: 0px;">删除帖子</button></div>
+			  </div>
+			  </div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+       const vue = new Vue({
+		   el: '#speak',
+		   data: {
+			   test: 123,
+			   show: 0,
+			   name: '',
+			   password: '',
+			   leepF: 0,
+			   login: 0,
+			   tList: [],
+			   uList: []
+		   },
+		   methods: {
+			   imgList(str) {
+			     return str.split('&')
+			   },
+			   passState(id, lod) {
+				   axios.post('http://localhost:8086/community/pass?id='+id+'&state='+lod).then(resp =>{
+						this.getTlaist()
+					})
+			   },
+			   delC(cid) {
+				  axios.post('http://localhost:8086/community/del?id='+cid) .then(resp =>{
+						this.getTlaist()
+					})
+			   },
+			   getTlaist() {
+				   axios.get('http://localhost:8086/community/adminGet').then(resp =>{
+				   						this.tList = resp.data  
+				   })
+			   },
+			   getTt() {
+				   let leepGet = setInterval(()=> {
+					   if (this.leepF === 0){
+						   clearInterval(leepGet)
+					   }
+					   axios.get('http://localhost:8086/community/adminGet').then(resp =>{
+						   console.log(resp.data.length !== this.tList.length);
+						   if(resp.data.length !== this.tList.length){
+							   this.tList = resp.data  
+						   }					
+					   })
+				   },280)
+			   },
+			   getUsers() {
+				   axios.get('http://localhost:8086/admin/getUser').then(resp =>{
+				   						this.uList = resp.data  
+				   })
+			   },
+			   banUser(uid) {
+				   axios.post('http://localhost:8086/admin/banUser?id='+uid).then(resp =>{
+						this.getUsers()
+					})
+				},
+				uneasl(uid) {
+					axios.post('http://localhost:8086/admin/unseal?id='+uid).then(resp =>{
+						this.getUsers()
+					})
+				},
+				ln() {
+					axios.post('http://localhost:8086/admin/login?name='+this.name+'&password='+this.password).then(resp =>{
+						console.log(resp.data);
+						if(resp.data){	
+							this.login=1
+							this.leepF = 1
+							this.getTt()
+						}
+					})
+				},
+				exit() {
+					this.login = 0
+					this.leepF = 0
+					this.name = ''
+					this.password = ''
+				},
+				timesdd() {
+					setInterval(()=>{
+						const day = new Date().getHours()
+						const wel = document.getElementById("add")
+						if(day>=6&&day<11){
+							
+						wel.innerHTML='一日之计在于晨,早上好!'
+							
+						}else if(day>=11&&day<14){
+						
+						wel.innerHTML='一顿美味的午饭一个美好的中午,中午好!'
+							
+						}else if(day>=14&&day<17){
+							
+						wel.innerHTML='下午是摸鱼的好时机,下午好!'
+							
+						}else if(day>=17&&day<19){
+								
+						wel.innerHTML='一顿美味的晚餐是对工作一天的奖励,傍晚好!'
+						
+						}else if(day>=19&&day<23){
+						
+						wel.innerHTML='这将是会是个美好的夜晚,晚上好!'
+						
+						}else {
+						wel.innerHTML='夜深了请注意休息'
+						}
+					},200)
+				}
+		   },
+		   mounted(){
+			   this.timesdd()
+		   }
+	   })
+    </script>
+</html>

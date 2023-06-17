@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+ <head>
+   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Coolgame&copyChina2077主頁</title>
+  <link rel="stylesheet" type="text/css" href="./css/2.css"/>
+  <script src="js/vue.js" type="text/javascript"></script>
+  <script src="js/axios.js" type="text/javascript"></script>
+  <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+  <style>
+    body{
+		overflow: hidden;
+	}
+    .neon-wrap {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .neon-wrap span {
+      display: block;
+    }
+    .neon-text {
+      font-family: 'Monoton', cursive;
+      font-size: 100px;
+      animation: neon 4s infinite;
+    }
+    .neon-by {
+      color: #e91e63;
+      text-shadow: -3px 0px 5px #e91e63, 0px 0px 2px #e91e63;
+    }
+    .ertd{
+      color: #7fff00;
+      position: absolute;
+      top: 210%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      text-shadow: -3px 0px 5px #20e9bd, 0px 0px 2px #20e9bd;
+
+    }
+    @keyframes neon {
+      0%, 30%, 32%, 34% {
+        color: #222;
+        text-shadow: -3px 0px 5px #222, 0px 0px 2px #222; 
+      }
+      31%, 33%, 35%, 100% {
+        color: #e91e63;
+        text-shadow: -3px 0px 5px #e91e63, 0px 0px 2px #e91e63;
+      }
+    }
+  </style>
+ </head>
+  <body>
+	<div id="fun">
+		<div class="neon-wrap" v-show="show===0">
+		    <span class="neon-text" style="font-size: 290px;">^=^⌨@Fun</span>
+		    <span class="neon-by" style="font-size: 30px;">欢迎登录 {{test}}  管理员</span>
+		<!--    <span class="ertd">©本尼的創意工坊保留所有权利。所有商标均为其在中国及其它国家/地区的各自持有者所有</span> -->
+		</div>
+		  <div id="6">
+		   <a onclick="show=0">
+		      <span></span>
+			  <span></span>
+			  <span></span>
+			  <span></span>	
+			  汽車展示  
+		   </a>
+		   <a onclick="show=1">
+		      <span></span>
+			  <span></span>
+			  <span></span>
+			  <span></span>
+			  用户管理
+		   </a>
+		   <a onclick="show=2">
+		      <span></span>
+			  <span></span>
+			  <span></span>
+			  <span></span>
+			 帖子审核     
+		   </a>
+		   <a onclick="show=3">
+		      <span></span>
+			  <span></span>
+			  <span></span>
+			  <span></span>
+			  購買改裝車/配件
+		   </a>
+		    <a onclick="test()">
+		      <span></span>
+			  <span></span>
+			  <span></span>
+			  <span></span>
+			   退出登录 
+		   </a>
+	</div>
+ </body>
+ <script type="text/javascript">
+        const vue = new Vue({
+ 		   el: '#fun',
+ 		   data: {
+ 			   test: 123,
+ 			   show: 0,
+ 			   tList: []
+ 		   },
+ 		   methods: {
+ 			   imgList(str) {
+ 			     return str.split('&')
+ 			   },
+ 			   passState(id, lod) {
+ 				   axios.post('http://localhost:8086/community/pass?id='+id+'&state='+lod)
+ 			   },
+ 			   delC(cid) {
+ 				  axios.post('http://localhost:8086/community/del?id='+cid) 
+ 			   },
+			   test() {
+				   console.log(213213);
+			   }
+ 		   }
+ 		   // mounted(){
+ 			  //  setInterval(() => {
+ 				 //   axios.get('http://localhost:8086/community/adminGet').then(resp =>{
+ 				 //   				 this.tList = resp.data  
+ 				 //   })
+ 			  //  },200)
+ 		   // }
+ 	   })
+     </script>
+</html>

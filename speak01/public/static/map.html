@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>订单确认</title>
+    <script src="./js/vue.js"></script>
+    <script src="./js/axios.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .btn{
+            border: 0px;
+            background-color: rgb(41, 113, 247);
+            font-size: 20px;
+            margin-top: 30px;
+            width: 200px;
+            height: 45px;
+            transition: all .3s;
+            color: white;
+        }
+        .btn:hover{
+            background-color: rgb(98, 152, 253);
+        }
+    </style>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div style="width: 100%;height: 10vh;background-color: rgb(41, 113, 247);"><img src="./img/菜鸟裹裹.png" style="vertical-align: bottom;margin-left: 30px;" alt=""><span style="font-size: 30px;color: white;">SpeaK快速下单助手</span> <span style="font-size: 14px;color: aliceblue;">fun联合菜鸟裹裹&copy;出品</span></div>
+    <div style="width: 60%;height: 90vh;margin: 0 auto;" id="app">
+        <div style="text-align: center;"><h1>请确保您的收货信息无误</h1></div>
+        <div style="font-size: 24px;">地址:
+            <input id="ad"  style="font-size: 24px;border: 0px;background: none;width: 70px;" disabled>省(市/区)
+            <input id="as"  style="font-size: 24px;border: 0px;background: none;" disabled>
+            <input type="text" v-model="ardess" style="border: 0px;border-bottom: 1px solid black;width: 80%;font-size: 24px;outline: none;" placeholder="详细地址">
+        </div>
+        <div style="text-align: center;margin-top: 30px;"><h3>请在下方地图选择您所在的省市(滚轮可缩放)</h3></div>
+        <div id="main" style="height:50vh;width: 99%;margin: 0 auto;border: 1px solid black;border-radius: 15px;background-color: white;"></div>
+            <div style="font-size: 24px;margin-top: 30px;">收货人电话:<input type="text" style="border: 0px;border-bottom: 1px solid black;font-size: 24px;outline: none;" placeholder="电话" v-model="ips"> </div>
+            <div style="font-size: 24px;margin-top: 30px;">收货人昵称:<input type="text" style="border: 0px;border-bottom: 1px solid black;font-size: 24px;outline: none;" placeholder="昵称" v-model="name"> </div>
+        <button class="btn" @click="bb()">填好了,去支付</button>
+    </div>
+    <!-- ECharts单文件引入 -->
+</body>
+ <script src="./js/echarts.js"></script>
+    <script type="text/javascript">
+        const var2 = new Vue({
+            el: '#app',
+            data: {
+                name: '',
+                ips: '',
+                gid: '',
+                ardess:'',
+                out: 0,
+                buy: 0,
+                gimg: '',
+                gname: ''
+            },
+            methods: {
+                aa() {
+                    this.name = window.sessionStorage.getItem('name')
+                    this.ips = window.sessionStorage.getItem('ipone')
+                    this.gid = window.sessionStorage.getItem('gid')
+                    this.buy = window.sessionStorage.getItem('buy')
+                    this.out = window.sessionStorage.getItem('out')
+                    this.gname = window.sessionStorage.getItem('gname')
+                    this.gimg = window.sessionStorage.getItem('gimg')
+                },
+                bb() {
+                    if(this.ardess===''){
+                        console.log(this.ardess);
+                        alert('请填写好收货地址')
+                        return
+                    }
+                    if(this.ips.length<11){
+                        alert('请填写正确的电话号码')
+                        return
+                    }
+                    axios.post('http://localhost:8086/ccs/del?id='+this.gid)
+                    .then(resp => {
+                        if(resp.data === true) {
+                            this.inss()
+                            window.location.href = './pay.html'
+                            window.sessionStorage.setItem('ipone',this.ips)
+                        }else{
+                            alert('支付晚了,被别人抢先一步买了~')
+                        }
+                    })
+                },
+                inss() {
+                    axios.post('http://localhost:8086/take/into?buy='+this.buy+"&out="+this.out+"&gimg="+this.gimg+"&gname="+this.gname)
+                },
+                cc() {
+                    require.config({
+                   paths: {
+                       echarts: 'http://echarts.baidu.com/build/dist'
+                   }
+               });
+               // 使用
+               require(
+                   [
+                       'echarts',
+                       'echarts/chart/map' // 使用柱状图就加载bar模块，按需加载
+                   ],
+                   function (ec) {
+                       // 基于准备好的dom，初始化echarts图表
+                       var myChart = ec.init(document.getElementById('main'));
+                   option = {
+                      tooltip : {
+                          trigger: 'item'
+                      },
+                      series : [
+                          {
+                              tooltip: {
+                                  trigger: 'item',
+                                  formatter: '{b}'
+                              },
+                              name: '选择器',
+                              type: 'map',
+                              mapType: 'china',
+                              mapLocation: {
+                                  x: 'left',
+                                  y: 'top',
+                                  width: '95%'
+                              },
+                              roam: true,
+                              selectedMode : 'single',
+                              itemStyle:{
+                                  //normal:{label:{show:true}},
+                                  emphasis:{label:{show:true}}
+                              },
+                              data:[
+                                  {name: '北京', selected:false},
+                                  {name: '广东', selected:false},
+                                  {name: '天津', selected:false},
+                                  {name: '上海', selected:false},
+                                  {name: '重庆', selected:false},
+                                  {name: '江苏', selected:false},
+                                  {name: '四川', selected:false},
+                                  {name: '宁夏', selected:false},
+                                  {name: '广西', selected:false},
+                                  {name: '河北', selected:false},
+                                  {name: '河南', selected:false},
+                                  {name: '云南', selected:false},
+                                  {name: '辽宁', selected:false},
+                                  {name: '黑龙江', selected:false},
+                                  {name: '湖南', selected:false},
+                                  {name: '安徽', selected:false},
+                                  {name: '山东', selected:false},
+                                  {name: '新疆', selected:false},
+                                  {name: '浙江', selected:false},
+                                  {name: '江西', selected:false},
+                                  {name: '湖北', selected:false},
+                                  {name: '广西', selected:false},
+                                  {name: '甘肃', selected:false},
+                                  {name: '山西', selected:false},
+                                  {name: '内蒙古', selected:false},
+                                  {name: '陕西', selected:false},
+                                  {name: '吉林', selected:false},
+                                  {name: '福建', selected:false},
+                                  {name: '贵州', selected:false},
+                                  {name: '青海', selected:false},
+                                  {name: '西藏', selected:false},
+                                  {name: '海南', selected:false},
+                                  {name: '台湾', selected:false},
+                                  {name: '香港', selected:false},
+                                  {name: '澳门', selected:false}
+                              ]
+                          }
+                      ],
+                      animation: false
+                  };
+                  var ecConfig = require('echarts/config');
+                  myChart.on(ecConfig.EVENT.MAP_SELECTED, function (param){
+                   console.log(param);
+                      var selected = param.selected;
+                      var selectedProvince;
+                      var name;
+                      for (var i = 0, l = option.series[0].data.length; i < l; i++) {
+                          name = option.series[0].data[i].name;
+                          option.series[0].data[i].selected = selected[name];
+                          if (selected[name]) {
+                              selectedProvince = name;
+                          }
+                      }
+                      if (typeof selectedProvince == 'undefined') {
+                          option.series.splice(1);
+                          option.legend = null;
+                          option.dataRange = null;
+                          console.log(option);
+                          myChart.on(option, true);
+                          return;
+                      }
+                      option.series[1] = {
+                          type: 'map',
+                          mapType: selectedProvince,
+                          itemStyle:{
+                              normal:{label:{show:true}},
+                              emphasis:{label:{show:true}}
+                          },
+                          mapLocation: {
+                              x: '54%',
+                              y: '25%',
+                              width: '65%',
+                              height: '65%'
+                          },
+                          roam: true,
+                          data:[
+                          ]
+                      };
+                      myChart.on('click', function (param){
+                        let flags = 0
+                        for(let i = 0; i < option.series[0].data.length; i++) {
+                            if (option.series[0].data[i].name !== param.name) {
+                                flags++
+                            }
+                        }
+                        if(flags==option.series[0].data.length) {
+                            document.getElementById('as').value =param.name
+                            console.log(23)
+                        } else {
+                            document.getElementById('ad').value =param.name
+                            console.log(24)
+                        }
+                      })
+                      myChart.setOption(option);
+                  })
+                       // 为echarts对象加载数据
+                       myChart.setOption(option);
+                   }
+               );
+                }
+            },
+            mounted(){
+                this.aa()
+                this.cc()
+            }
+        })
+        // 路径配置
+    </script>
