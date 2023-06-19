@@ -1,1 +1,2 @@
-speak01/.node_modeles/*
+speak01/node_modules/*
+.history/*
