@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.dao.TakeMapper">
+    <select id="inspectTake" resultType="TakeRoom">
+        select * from takeroom where userid=#{id} and gid=#{gid}
+    </select>
+    <select id="getList" resultType="TakeRoom">
+        select `id`,`userid`,`uimg`,`uname`,`room`,`gid`,`gimg`,`newtext` from takeroom where userid=#{id}
+    </select>
+    <insert id="sendText" >
+        insert into taketext (`username`,`userimg`,`ctime`,`text`,`room`)
+        values (#{uname},#{uimg},#{ctime},#{text},#{room})
+    </insert>
+    <select id="getTextList" resultType="TextObject">
+        select `id`,`username`,`userimg`,`ctime`,`text`,`img`,`room` from taketext where room=#{room}
+    </select>
+    <select id="selectText" resultType="TakeRoom">
+        select `id`,`userid`,`uimg`,`uname`,`room`,`gid`,`gimg`,`newtext` from takeroom
+        where userid=#{id} and
+        uname like concat('%',#{select},'%') or userid=#{id} and
+        room like concat('%',#{select},'%') or userid=#{id} and
+        gimg like concat('%',#{select},'%')
+    </select>
+    <insert id="sendImg">
+        insert into taketext (`username`,`userimg`,`ctime`,`img`,`room`)
+        values (#{uname},#{uimg},#{ctime},#{img},#{room})
+    </insert>
+</mapper>
